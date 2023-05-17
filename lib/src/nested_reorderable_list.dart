@@ -111,7 +111,7 @@ class NestedReorderableList<T> extends StatelessWidget {
     required this.onReorder,
     this.showDragTargetOnlyDuringDrag = false,
     this.dropTargetSize = 8.0,
-    this.debug = false,
+    this.debugShowDragTarget = false,
   });
 
   /// The items of the list.
@@ -130,7 +130,7 @@ class NestedReorderableList<T> extends StatelessWidget {
   final double dropTargetSize;
 
   /// Whether to enable debug mode.
-  final bool debug;
+  final bool debugShowDragTarget;
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +140,7 @@ class NestedReorderableList<T> extends StatelessWidget {
       onReorder: onReorder,
       showDragTargetOnlyDuringDrag: showDragTargetOnlyDuringDrag,
       dropTargetSize: dropTargetSize,
-      debug: debug,
+      debugShowDragTarget: debugShowDragTarget,
     );
   }
 }
@@ -157,14 +157,14 @@ class _NestedReorderableList<T> extends StatefulWidget {
     required this.onReorder,
     required this.showDragTargetOnlyDuringDrag,
     required this.dropTargetSize,
-    required this.debug,
+    required this.debugShowDragTarget,
   });
   final List<DragAndDropItem<T>> dragAndDropItems;
   final DragAndDropItemBuilder<T> itemBuilder;
   final OnDragFinish<T> onReorder;
   final bool showDragTargetOnlyDuringDrag;
   final double dropTargetSize;
-  final bool debug;
+  final bool debugShowDragTarget;
 
   @override
   _NestedReorderableListState<T> createState() => _NestedReorderableListState();
@@ -185,6 +185,7 @@ class _NestedReorderableListState<T> extends State<_NestedReorderableList<T>> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         for (var i = 0; i < widget.dragAndDropItems.length; i++)
           _buildListItem(
@@ -224,7 +225,7 @@ class _NestedReorderableListState<T> extends State<_NestedReorderableList<T>> {
                     level: level,
                     parent: parent,
                     insertPosition: InsertPosition.before,
-                    color: widget.debug
+                    color: widget.debugShowDragTarget
                         ? Colors.blue.withOpacity(0.2)
                         : Colors.transparent,
                     dragTargetSize: 0,
@@ -253,7 +254,7 @@ class _NestedReorderableListState<T> extends State<_NestedReorderableList<T>> {
               level: level + 1,
               parent: category,
             ),
-        if (_shouldShowEmptyChildDummyDragTarget(
+        if (_shouldShowEmptyChildDragTarget(
           category,
           level,
         ))
@@ -263,7 +264,7 @@ class _NestedReorderableListState<T> extends State<_NestedReorderableList<T>> {
             level: level,
             parent: parent,
             insertPosition: InsertPosition.asChild,
-            color: widget.debug
+            color: widget.debugShowDragTarget
                 ? Colors.yellow.withOpacity(0.2)
                 : Colors.transparent,
             dragTargetSize: widget.dropTargetSize,
@@ -279,8 +280,9 @@ class _NestedReorderableListState<T> extends State<_NestedReorderableList<T>> {
             level: level,
             parent: parent,
             insertPosition: InsertPosition.after,
-            color:
-                widget.debug ? Colors.red.withOpacity(0.2) : Colors.transparent,
+            color: widget.debugShowDragTarget
+                ? Colors.red.withOpacity(0.2)
+                : Colors.transparent,
             dragTargetSize: widget.dropTargetSize,
           ),
       ],
@@ -400,9 +402,12 @@ class _NestedReorderableListState<T> extends State<_NestedReorderableList<T>> {
                   Container(
                     height: dragTargetSize,
                     color: color,
-                    child: widget.debug
+                    child: widget.debugShowDragTarget
                         ? Text(
                             'index: $index, insertPosition: $insertPosition',
+                            style: const TextStyle(
+                              fontSize: 8,
+                            ),
                           )
                         : null,
                   ),
@@ -528,7 +533,7 @@ class _NestedReorderableListState<T> extends State<_NestedReorderableList<T>> {
     );
   }
 
-  bool _shouldShowEmptyChildDummyDragTarget(
+  bool _shouldShowEmptyChildDragTarget(
     DragAndDropItem<T> category,
     int level,
   ) {
