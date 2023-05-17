@@ -62,6 +62,20 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ],
     ),
+    DragAndDropItem<String>(
+      key: 'Item 3',
+      content: 'Item 3',
+      children: [
+        DragAndDropItem<String>(
+          key: 'Item 3.1',
+          content: 'Item 3.1',
+        ),
+        DragAndDropItem<String>(
+          key: 'Item 3.2',
+          content: 'Item 3.2',
+        ),
+      ],
+    ),
   ];
 
   @override
@@ -71,15 +85,30 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: NestedReorderableList(
-        dragAndDropItems: items,
-        itemBuilder: (context, item) => ListTile(
-          key: Key(item.key),
-          title: Text(item.content),
+      body: SingleChildScrollView(
+        child: NestedReorderableList(
+          dragAndDropItems: items,
+          itemBuilder: (context, item) => ListTile(
+            key: Key(item.key),
+            title: Text(item.content),
+          ),
+          onReorder: (source, destination, _) {
+            setState(() {
+              // Determine source and destination lists
+              final sourceList = (source.parentIndex == null)
+                  ? items
+                  : items[source.parentIndex!].children;
+              final destList = (destination.parentIndex == null)
+                  ? items
+                  : items[destination.parentIndex!].children;
+
+              // Perform removal and insertion
+              final moved = sourceList.removeAt(source.index);
+              final destinationIndex = destination.index;
+              destList.insert(destinationIndex, moved);
+            });
+          },
         ),
-        onReorder: (source, destination, movedItem) {
-          // Implement reordering logic
-        },
       ),
     );
   }
