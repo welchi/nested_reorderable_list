@@ -25,7 +25,20 @@ NestedReorderableList<String>(
   dragAndDropItems: items,
   itemBuilder: (BuildContext context, DragAndDropItem<String> item) => Text(item.content),
   onReorder: (SourceLocation source, DestinationLocation destination, DragAndDropItem<String> movedItem) {
-    // Handle the reordering logic here.
+    setState(() {
+      // Determine the source and destination lists based on whether the parentIndex is null
+      final sourceList = (source.parentIndex == null)
+        ? items
+        : items[source.parentIndex!].children;
+      final destList = (destination.parentIndex == null)
+        ? items
+        : items[destination.parentIndex!].children;
+        
+      // Perform the removal and insertion operation
+      final moved = sourceList.removeAt(source.index);
+      final destinationIndex = destination.index;
+      destList.insert(destinationIndex, moved);
+    });
   },
 );
 ```
