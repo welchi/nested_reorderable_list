@@ -610,6 +610,11 @@ class _NestedReorderableListState<T> extends State<_NestedReorderableList<T>> {
         ? 1
         : 0;
 
+    final indexDiff2 = draggedCategoryParent?.key != parent?.key &&
+            insertPosition == InsertPosition.after
+        ? 1
+        : 0;
+
     final destinationParentIndex = parent != null
         ? widget.dragAndDropItems.indexOf(
             parent,
@@ -617,7 +622,7 @@ class _NestedReorderableListState<T> extends State<_NestedReorderableList<T>> {
         : null;
     final destinationLocation = DestinationLocation(
       parentIndex: destinationParentIndex,
-      index: index - indexDiff,
+      index: index - indexDiff + indexDiff2,
       insertPosition: insertPosition,
     );
 
