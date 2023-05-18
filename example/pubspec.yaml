@@ -7,10 +7,12 @@ dependencies:
   flutter:
     sdk: flutter
   nested_reorderable_list:
-    path: ../
 dev_dependencies:
   flutter_test:
     sdk: flutter
   pedantic_mono:
+dependency_overrides:
+  nested_reorderable_list:
+    path: ../
 flutter:
   uses-material-design: true
