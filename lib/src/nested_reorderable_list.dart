@@ -581,49 +581,13 @@ class _NestedReorderableListState<T> extends State<_NestedReorderableList<T>> {
             .children[sourceLocation.index]
         : widget.dragAndDropItems[sourceLocation.index];
 
-    // There's a special process for adding child elements to parent elements
-    // that don't have child elements.
-    if (insertPosition == InsertPosition.asChild) {
-      final destinationLocation = DestinationLocation(
-        parentIndex: index,
-        index: 0,
-        insertPosition: insertPosition,
-      );
-
-      widget.onReorder(
-        sourceLocation,
-        destinationLocation,
-        draggedCategory,
-      );
-
-      return;
-    }
-
-    // When reordering between parent elements or between child elements
-    // that have the same parent, and the drop point (index) is behind
-    // the dragged point, and the InsertPosition is before,
-    // we reduce the index by 1
-    // (since one element has been pulled out by the drag).
-    final indexDiff = draggedCategoryParent?.key == parent?.key &&
-            index > draggedCategoryIndex &&
-            insertPosition == InsertPosition.before
-        ? 1
-        : 0;
-
-    final indexDiff2 = draggedCategoryParent?.key != parent?.key &&
-            insertPosition == InsertPosition.after
-        ? 1
-        : 0;
-
-    final destinationParentIndex = parent != null
-        ? widget.dragAndDropItems.indexOf(
-            parent,
-          )
-        : null;
-    final destinationLocation = DestinationLocation(
-      parentIndex: destinationParentIndex,
-      index: index - indexDiff + indexDiff2,
+    final destinationLocation = getDestinationLocation(
+      index: index,
+      parent: parent,
+      draggedCategoryIndex: draggedCategoryIndex,
+      draggedCategoryParent: draggedCategoryParent,
       insertPosition: insertPosition,
+      dragAndDropItems: widget.dragAndDropItems,
     );
 
     widget.onReorder(
@@ -632,4 +596,53 @@ class _NestedReorderableListState<T> extends State<_NestedReorderableList<T>> {
       draggedCategory,
     );
   }
+}
+
+/// Returns the location where the dragged element should be inserted.
+@visibleForTesting
+DestinationLocation getDestinationLocation<T>({
+  required int index,
+  required DragAndDropItem<T>? parent,
+  required int draggedCategoryIndex,
+  required DragAndDropItem<T>? draggedCategoryParent,
+  required InsertPosition insertPosition,
+  required List<DragAndDropItem<T>> dragAndDropItems,
+}) {
+  // There's a special process for adding child elements to parent elements
+  // that don't have child elements.
+  if (insertPosition == InsertPosition.asChild) {
+    return DestinationLocation(
+      parentIndex: index,
+      index: 0,
+      insertPosition: insertPosition,
+    );
+  }
+
+  // When reordering between parent elements or between child elements
+  // that have the same parent, and the drop point (index) is behind
+  // the dragged point, and the InsertPosition is before,
+  // we reduce the index by 1
+  // (since one element has been pulled out by the drag).
+  final indexDiff = draggedCategoryParent?.key == parent?.key &&
+          index > draggedCategoryIndex &&
+          insertPosition == InsertPosition.before
+      ? 1
+      : 0;
+
+  final indexDiff2 = draggedCategoryParent?.key != parent?.key &&
+          insertPosition == InsertPosition.after
+      ? 1
+      : 0;
+
+  final destinationParentIndex = parent != null
+      ? dragAndDropItems.indexOf(
+          parent,
+        )
+      : null;
+
+  return DestinationLocation(
+    parentIndex: destinationParentIndex,
+    index: index - indexDiff + indexDiff2,
+    insertPosition: insertPosition,
+  );
 }
