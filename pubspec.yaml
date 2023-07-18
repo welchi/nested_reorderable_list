@@ -1,6 +1,6 @@
 name: nested_reorderable_list
 description: Nested Reorderable List
-version: 0.0.1
+version: 0.0.2
 repository: https://github.com/welchi/nested_reorderable_list
 
 environment:
