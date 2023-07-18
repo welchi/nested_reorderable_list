@@ -25,7 +25,7 @@ Here's a basic example of how to use the NestedReorderableList widget:
 ```dart
 NestedReorderableList<String>(
   dragAndDropItems: items,
-  itemBuilder: (BuildContext context, DragAndDropItem<String> item) => Text(item.content),
+  itemBuilder: (BuildContext context, DragAndDropItem<String> item) => ListTile(key: Key(item.key), title: Text(item.content)),
   onReorder: (SourceLocation source, DestinationLocation destination, DragAndDropItem<String> movedItem) {
     setState(() {
       // Determine the source and destination lists based on whether the parentIndex is null
